@@ -1,0 +1,120 @@
+/* Ex1: Từ bộ AdventureworksDW2019, bảng DimEmployee,  
+
+Lấy ra EmployeeKey, FirstName, LastName, BaseRate, VacationHours, SickLeaveHours 
+
+Sau đó lấy ra thêm các cột như sau:  
+
+a. Cột FullName  được lấy ra từ: FirstName + '  ' + LastName 
+
+b. Cột VacationLeavePay được lấy ra từ: BaseRate * VacationHours 
+
+c. Cột SickLeavePay được lấy ra từ: BaseRate * SickLeaveHours  
+
+d.  Cột TotalLeavePay được lấy ra từ VacationLeavePay + SickLeavePay  
+
+*/  
+-- Your code here 
+
+USE AdventureWorksDW2019 
+
+SELECT EmployeeKey, FirstName, LastName, BaseRate, VacationHours, SickLeaveHours 
+
+, FirstName + ' ' + LastName AS 'FullName' --(a) 
+
+, BaseRate * VacationHours AS 'VacationLeavePay' --(b) 
+
+, BaseRate * SickLeaveHours AS 'SickLeavePay' --(c) 
+
+, BaseRate * (VacationHours + SickLeaveHours) AS 'TotalLeavePay' --(d) 
+
+FROM DimEmployee 
+
+/* Ex2: Từ bộ AdventureworksDW2019, bảng FactInternetSales,  
+
+Lấy ra SalesOrderNumber, ProductKey, OrderDate 
+
+Sau đó lấy ra thêm các cột như sau:  
+
+a. Cột TotalRevenue được lấy ra từ: OrderQuantity * UnitPrice  
+
+B. Cột TotalCost được lấy ra từ: ProductStandardCost + DiscountAmount 
+
+c. Cột Profit được lấy ra từ: TotalRevenue - TotalCost  
+
+d. Cột Profit Margin được lấy ra từ: (TotalRevenue - TotalCost)/TotalRevenue * 100 
+
+*/  
+
+-- Your code here 
+
+USE AdventureWorksDW2019 
+
+SELECT SalesOrderNumber, ProductKey, OrderDate 
+
+, OrderQuantity * UnitPrice AS 'TotalRevenue' --(a) 
+
+, ProductStandardCost + DiscountAmount AS 'TotalCost' --(b) 
+
+, (OrderQuantity * UnitPrice) - ProductStandardCost - DiscountAmount AS 'Profit' --(c) 
+
+, (OrderQuantity * UnitPrice - ProductStandardCost - DiscountAmount) / (OrderQuantity * UnitPrice) * 100 AS 'ProfitMargin' --(d) 
+
+FROM FactInternetSales 
+
+/* Ex3: Từ bộ AdventureworksDW2019, bảng FactProductInventory,  
+
+Lấy ra các cột như sau:  
+
+MovementDate 
+
+, ProductKey 
+
+Và  
+
+A. Cột NoProductEOD lấy ra từ UnitsBalance + UnitsIn - UnitsOut  
+
+b. Cột TotalCost lấy ra từ: NoProductEOD * UnitCost  
+
+*/  
+
+-- Your code here 
+USE AdventureWorksDW2019 
+
+SELECT MovementDate, ProductKey 
+
+, UnitsBalance + UnitsIn - UnitsOut AS 'NoProductEOD' --(a) 
+
+, (UnitsBalance + UnitsIn - UnitsOut) * UnitCost AS 'TotalCost' --(b) 
+
+FROM FactProductInventory 
+
+/* Ex4: Từ bộ AdventureworksDW2019, bảng DimGeography, lấy ra EnglishCountryRegionName, 
+
+City, StateProvinceName. Loại bỏ các dòng trùng lặp và sắp xếp bảng kết quả theo thứ tự  
+
+tăng dần của EnglishCountryRegionName và những dòng có cùng giá trị Country thì sắp xếp thêm theo thứ tự giảm dần của City  
+
+*/ 
+-- Your code here 
+USE AdventureWorksDW2019 
+
+SELECT DISTINCT EnglishCountryRegionName, City, StateProvinceName 
+
+FROM DimGeography 
+
+ORDER BY EnglishCountryRegionName ASC, City DESC 
+
+/* Ex5: Từ bộ AdventureworksDW2019, bảng DimProduct,  
+
+lấy ra EnglishProductName của top 10% các sản phẩm có mức ListPrice cao nhất  
+
+*/  
+
+-- Your code here 
+USE AdventureWorksDW2019 
+
+SELECT TOP 10 PERCENT EnglishProductName 
+
+FROM DimProduct 
+
+ORDER BY ListPrice DESC  
