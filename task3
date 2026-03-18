@@ -1,0 +1,112 @@
+/*Ex 1: Từ bảng dbo.FactInternetSales và dbo.DimSalesTerritory, lấy ra thông tin SalesOrderNumber, SalesOrderLineNumber, ProductKey, SalesTerritoryCountry  của các bản ghi có SalesAmount trên 1000 
+*/ 
+ -- Your code here 
+USE AdventureWorksDW2019 
+SELECT Sales.SalesOrderNumber 
+, Sales.SalesOrderLineNumber 
+, Sales.ProductKey 
+, Territory.SalesTerritoryCountry 
+FROM FactInternetSales AS Sales 
+LEFT JOIN DimSalesTerritory AS Territory 
+on Sales.SalesTerritoryKey = Territory.SalesTerritoryKey 
+WHERE Sales.SalesAmount > 1000 
+
+/*Ex 2: Từ bảng dbo.DimProduct và dbo.DimProductSubcategory. Lấy ra ProductKey, EnglishProductName và Color của các sản phẩm thoả mãn EnglishProductSubCategoryName chứa chữ 'Bikes' và ListPrice có phần nguyên là 3399 
+*/ 
+-- Your code here 
+USE AdventureWorksDW2019 
+SELECT b.EnglishProductSubCategoryName 
+, a.ListPrice 
+, a.ProductKey 
+, a.EnglishProductName 
+, a.Color 
+FROM DimProduct AS a 
+LEFT JOIN DimProductSubcategory AS b  
+on a.ProductSubCategoryKey = b.ProductSubCategoryKey 
+WHERE b.EnglishProductSubCategoryName LIKE '%Bikes%' 
+AND a.ListPrice >= 3399  AND a.ListPrice <3400 
+
+/* Ex 3: Từ bảng dbo.DimPromotion, dbo.FactInternetSales, lấy ra ProductKey, SalesOrderNumber, SalesAmount từ các bản ghi thoả mãn DiscountPct >= 20% */ 
+
+-- Your code here 
+USE AdventureWorksDW2019 
+SELECT s.ProductKey 
+, s.SalesOrderNumber 
+, s.SalesAmount 
+FROM DimPromotion AS p  
+JOIN FactInternetSales AS s  
+on p.PromotionKey = s.PromotionKey 
+WHERE p.DiscountPct >= 0.2 
+
+/* Ex 4: Từ bảng dbo.DimCustomer, dbo.DimGeography, lấy ra cột Phone, FullName (kết hợp FirstName, MiddleName, LastName kèm khoảng cách ở giữa) và City của các khách hàng có YearlyInCome > 150000 và CommuteDistance nhỏ hơn 5 Miles. 
+
+*/ 
+ -- Your code here 
+USE AdventureWorksDW2019 
+ SELECT DC.CustomerKey 
+, CONCAT_WS(' ', DC.FirstName, DC.MiddleName, DC.LastName) AS FullName 
+, DC.Phone 
+, DG.City 
+FROM DimCustomer AS DC 
+LEFT JOIN DimGeography AS DG 
+on DC.GeographyKey = DG.GeographyKey 
+WHERE DC.YearlyIncome > 150000
+, CommuteDistance < 5
+
+-- LogicalExpression   
+/* Ex 5: Từ bảng dbo.DimCustomer, lấy ra CustomerKey và thực hiện các yêu cầu sau:  
+
+a. Tạo cột mới đặt tên là YearlyInComeRange từ các điều kiện sau:  
+
+- Nếu YearlyIncome từ 0 đến 50000 thì gán giá trị "Low Income"  
+
+- Nếu YearlyIncome từ 50001 đến 90000 thì gán giá trị "Middle Income"  
+
+- Nếu YearlyIncome từ  90001 trở lên thì gán giá trị "High Income"  
+
+b. Tạo cột mới đặt tên là AgeRange từ các điều kiện sau:  
+
+- Nếu tuổi của Khách hàng tính đến 31/12/2019 đến 39 tuổi thì gán giá trị "Young Adults"  
+
+- Nếu tuổi của Khách hàng tính đến 31/12/2019 từ 40 đến 59 tuổi thì gán giá trị "Middle-Aged Adults"  
+
+- Nếu tuổi của Khách hàng tính đến 31/12/2019 lớn hơn 60 tuổi thì gán giá trị "Old Adults"  
+
+ */   
+-- Your code here 
+USE AdventureWorksDW2019 
+SELECT CustomerKey 
+--a 
+, CASE  
+WHEN YearlyIncome BETWEEN 0 AND 5000 THEN 'Low Income' 
+WHEN YearlyIncome BETWEEN 50001 AND 90000 THEN 'Middle Income' 
+WHEN YearlyIncome >= 90001 THEN 'High Income' 
+ELSE 'Unknown' 
+END as YearlyInComeRange 
+, BirthDate  
+--b 
+, CASE  
+WHEN DATEDIFF (YEAR, BirthDate, '2019-12-31') <= 39 THEN 'Young Aldults' 
+WHEN DATEDIFF (YEAR, BirthDate, '2019-12-31') BETWEEN 40 AND 59 THEN 'Middle-Aged Adults' 
+WHEN DATEDIFF (YEAR, BirthDate, '2019-12-31') > 60 THEN 'Old Adults' 
+ELSE 'Unknown'  
+END as  
+AgeRange 
+FROM DimCustomer 
+
+/* Ex 6: Từ bảng FactInternetSales, FactResellerSale và DimProduct. Tìm tất cả SalesOrderNumber có EnglishProductName chứa từ 'Road' và có màu vàng (Yellow). 
+*/ 
+-- Your code here 
+SELECT Sales.SalesOrderNumber 
+FROM FactInternetSales AS Sales 
+JOIN DimProduct AS Product 
+ON Sales.ProductKey = Product.ProductKey 
+WHERE Product.EnglishProductName LIKE '%Road%' 
+AND Product.Color = 'Yellow' 
+UNION 
+SELECT RS.SalesOrderNumber 
+FROM FactResellerSales AS RS 
+JOIN DimProduct AS Product 
+ON RS.ProductKey = Product.ProductKey 
+WHERE Product.EnglishProductName LIKE '%Road%' 
+AND Product.Color = 'Yellow'; 
