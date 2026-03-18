@@ -1,0 +1,153 @@
+/*Ex 1: Từ các bảng dbo.DimProduct, dbo.DimPromotion, dbo.FactInternetSales, lấy ra ProductKey, EnglishProductName của các dòng thoả mãn Discount Pct >= 20% */ 
+
+ -- Your code here 
+
+USE AdventureWorksDW2019 
+
+SELECT a.ProductKey, c.EnglishProductName 
+
+FROM FactInternetSales as a  
+
+LEFT JOIN DimPromotion as b  
+
+on a.PromotionKey = b.PromotionKey 
+
+LEFT JOIN DimProduct as c  
+
+on a.ProductKey = c.ProductKey 
+
+WHERE b.DiscountPct >= 0.2 
+
+ 
+
+/*Ex 2: Từ các bảng DimProduct, DimProductSubcategory, DimProductCategory, lấy ra các cột Product key, EnglishProductName, EnglishProductSubCategoryName, EnglishProductCategoryName của sản phẩm thoả mãn điều kiện EnglishProductCategoryName là 'Clothing' */ 
+
+  -- Your code here 
+
+USE AdventureWorksDW2019 
+
+SELECT a.ProductKey 
+
+, a.EnglishProductName 
+
+, b.EnglishProductSubcategoryName 
+
+, c.EnglishProductCategoryName 
+
+FROM DimProduct AS a  
+
+LEFT JOIN DimProductSubcategory AS b  
+
+on a.ProductSubcategoryKey = b.ProductSubcategoryKey 
+
+LEFT JOIN DimProductCategory AS c  
+
+on b.ProductCategoryKey = c.ProductCategoryKey 
+
+WHERE c.EnglishProductCategoryName = 'Clothing' 
+
+ 
+
+/*Ex 3: Từ bảng FactInternetSales và DimProduct, lấy ra ProductKey, EnglishProductName, ListPrice của những sản phẩm chưa từng được bán. Sử dụng 2 cách: toán tử IN và phép JOIN */ 
+
+-- Your code here 
+
+--Cach 1: JOIN 
+
+ 
+
+USE AdventureWorksDW2019 
+
+SELECT b.ProductKey 
+
+, b.EnglishProductName 
+
+, b.ListPrice 
+
+FROM FactInternetSales AS a  
+
+RIGHT JOIN DimProduct AS b  
+
+on a.ProductKey = b.ProductKey 
+
+WHERE a.ProductKey IS NULL 
+
+ORDER BY b.ProductKey ASC 
+
+ 
+
+--Cach 2: IN 
+
+ 
+
+SELECT ProductKey 
+
+, EnglishProductName 
+
+, ListPrice 
+
+FROM DimProduct 
+
+WHERE ProductKey NOT IN 
+
+      (SELECT DISTINCT ProductKey 
+
+       FROM FactInternetSales) 
+
+ 
+
+/*Ex 4: Từ bảng DimDepartmentGroup, lấy ra thông tin DepartmentGroupKey, DepartmentGroupName, ParentDepartmentGroupKey và thực hiện self-join lấy ra ParentDepartmentGroupName */ 
+
+  -- Your code here 
+
+ 
+
+USE AdventureWorksDW2019 
+
+SELECT Child.DepartmentGroupKey 
+
+, Child.DepartmentGroupName 
+
+, Child.ParentDepartmentGroupKey 
+
+, Parent.DepartmentGroupName AS ParentName 
+
+FROM DimDepartmentGroup AS Child 
+
+LEFT JOIN DimDepartmentGroup AS Parent 
+
+on CHild.ParentDepartmentGroupKey = Parent.DepartmentGroupKey 
+
+ 
+
+/*Ex 5: Từ bảng FactFinance, DimOrganization, DimScenario, lấy ra OrganizationKey, OrganizationName, Parent OrganizationKey, và thực hiện self-join lấy ra Parent OrganizationName, Amount thoả mãn điều kiện ScenarioName là 'Actual'. */ 
+
+ -- Your code here 
+
+USE AdventureWorksDW2019 
+
+SELECT c.OrganizationKey 
+
+, c.OrganizationName 
+
+, c.ParentOrganizationKey 
+
+, d.OrganizationName AS ParentOrganizationName 
+
+, a.Amount  
+
+FROM FactFinance AS a 
+
+LEFT JOIN DimScenario AS b 
+
+on a.ScenarioKey = b.ScenarioKey  
+
+LEFT JOIN DimOrganization AS c  
+
+on a.OrganizationKey = c.OrganizationKey 
+
+LEFT JOIN DimOrganization AS d  
+
+on c.ParentOrganizationKey = d.OrganizationKey 
+
+WHERE b.ScenarioName = 'Actual' 
